@@ -1,5 +1,5 @@
 class Article:
-    # keep track of every author created.
+    # keep track of every article created.
     all= []
     def __init__(self, author, magazine, title):
         # Validating the title 
@@ -12,12 +12,13 @@ class Author:
     def __init__(self, name):
         # verify the author name propertites
         if not isinstance(name, str):
-            raise TypeError("Name must be a string") 
+            raise TypeError("Name must be a string.") 
         if len(name) == 0:
             raise ValueError("Name must be longer than 0 characters.")
         self.name = name
         Author.all.append(self)
-    
+
+    @property 
     def name(self):
         # Author is now read only / cannot be changed.
         return self._name
@@ -43,18 +44,52 @@ class Author:
             return list({m.category for m in mags})
 
 class Magazine:
+    # Track all magazines
     def __init__(self, name, category):
+        # check if name is a tring, between 2 and 16 characters.
+        if not isinstance (name, str):
+            raise TypeError("Name must be a string.")
+        if not (2 <= len(name) <= 16):
+            raise ValueError("Name must be between 2 and 16 characters.")
+        # check if the category is a string and longer than 0 characters.
+        if not isinstance (category, str):
+            raise TypeError ("Category must be a string.")
+        if len(category) == 0:
+            raise ValueError("Category must be longer than 0 characters.")
         self.name = name
         self.category = category
+        Magazine.all.append(self)
 
     def articles(self):
-        pass
+        return [a for a in Article.all if a.magazine == self]
 
     def contributors(self):
-        pass
+        return list({a.author for a in self.articles()})
 
     def article_titles(self):
-        pass
+        arts = self.articles()
+        if not arts:
+            return None
+        return [a.title for a in arts]
 
     def contributing_authors(self):
-        pass
+         """Authors with more than 2 articles"""
+         counts = {}
+
+         for a in self.articles():
+            counts[a.author] = counts.get(a.author, 0) + 1
+
+         many = [author for author, count in counts.items() if count > 2]
+         return many if many else None
+    
+    def top_publisher(cls):
+        """Magazine with most articles."""
+        if not Article.all:
+            return None
+
+        counts = {mag: 0 for mag in cls.all}
+        for a in Article.all:
+            counts[a.magazine] += 1
+
+        top = max(counts, key=lambda m: counts[m])
+        return top if counts[top] > 0 else None
