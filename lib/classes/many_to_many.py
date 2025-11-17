@@ -2,10 +2,29 @@ class Article:
     # keep track of every article created.
     all= []
     def __init__(self, author, magazine, title):
-        # Validating the title 
+         # Validate title
+        if not isinstance(title, str):
+            raise TypeError("Title must be a string.")
+        if not (5 <= len(title) <= 50):
+            raise ValueError("Title must be between 5 and 50 characters.")
+
+        self._title = title   # title is read-only
+
+        # Validate author
+        if not isinstance(author, Author):
+            raise TypeError("Author must be an Author instance.")
+
+        # Validate magazine
+        if not isinstance(magazine, Magazine):
+            raise TypeError("Magazine must be a Magazine instance.")
+
+        # Use setters
+        
         self.author = author
         self.magazine = magazine
+        Article.all.append(self)
         self.title = title
+        
         
 class Author:
     all = []
